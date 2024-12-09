@@ -21,7 +21,7 @@ jobs:
           fi
 
   linux:
-    name: "x86_64-linux-gnu-{cpu,tpu}"
+    name: "x86_64-linux-gnu-{cpu,tpu,rocm}"
     needs: [create_draft_release]
     # We intentionally build on ubuntu 20 to compile against
     # an older version of glibc
@@ -32,6 +32,16 @@ jobs:
         with:
           otp-version: "24"
           elixir-version: "1.15.8"
+      # Get more space for rocm compilation
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
+          tool-cache: false
       # Setup the compilation environment
       - uses: abhinavsingh/setup-bazel@v3
         with:
@@ -51,6 +61,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           XLA_TARGET: tpu
+          CC: gcc-9
+      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XLA_TARGET: rocm
           CC: gcc-9
 
   macos:
