@@ -5,8 +5,16 @@ set -ex
 cd "$(dirname "$0")/../.."
 
 tag=$1
-
+    # Uploading is the final action after several hour long build,
+    # so in case of any temporary network failures we want to retry
+    # a number of times
+    for i in {1..10}; do
+      gh release upload --clobber $tag "$build_archive_dir/$archive_filename" && break
+      echo "Upload failed, retrying in 30s"
+      sleep 30
+    done
 # Ensure tasks are compiled
+mix deps.get
 mix compile
 
 if gh release list | grep $tag; then
@@ -16,8 +24,13 @@ if gh release list | grep $tag; then
   if gh release view $tag | grep $archive_filename; then
     echo "Found $archive_filename in $tag release artifacts, skipping compilation"
   else
-    XLA_BUILD=true mix compile
-
+    if [[ $XLA_TARGET == rocm ]]; then
+      ./builds/build.sh rocm
+      cp "$(pwd)/builds/output/rocm/build/*/cache/build/xla_extension-x86_64-linux-gnu-rocm.tar.gz" "$build_archive_dir/$archive_filename"
+    else
+      XLA_BUILD=true mix compile
+    fi
+    
     # Uploading is the final action after several hour long build,
     # so in case of any temporary network failures we want to retry
     # a number of times
