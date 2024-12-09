@@ -7,6 +7,7 @@ cd "$(dirname "$0")/../.."
 tag=$1
 
 # Ensure tasks are compiled
+mix deps.get
 mix compile
 
 if gh release list | grep $tag; then
