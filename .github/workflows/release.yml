@@ -1,8 +1,6 @@
 name: Release
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  - push
 
 jobs:
   create_draft_release:
