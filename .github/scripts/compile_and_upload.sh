@@ -18,11 +18,14 @@ if gh release list | grep $tag; then
     echo "Found $archive_filename in $tag release artifacts, skipping compilation"
   else
     if [[ $XLA_TARGET == rocm ]]; then
+      echo "BUILDING..."
       ./builds/build.sh rocm
       cp "$(pwd)/builds/output/rocm/build/*/cache/build/xla_extension-x86_64-linux-gnu-rocm.tar.gz" "$build_archive_dir/$archive_filename"
+      echo "BUILD COMPLETE"
     else
       XLA_BUILD=true mix compile
     fi
+    echo "UPLOADING..."
     
     # Uploading is the final action after several hour long build,
     # so in case of any temporary network failures we want to retry
