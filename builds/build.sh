@@ -54,8 +54,12 @@ case "$target" in
   ;;
 esac
 
+echo "DOCKER BUILD COMPLETE"
+
 docker run --rm \
   -v $(pwd)/builds/output/$target/build:/build \
   -v $(pwd)/builds/output/$target/.cache:/root/.cache \
   $XLA_DOCKER_FLAGS \
   xla-$target
+
+echo "DOCKER RUN COMPLETE"
