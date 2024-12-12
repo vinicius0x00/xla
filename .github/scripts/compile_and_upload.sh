@@ -20,9 +20,7 @@ if gh release list | grep $tag; then
     if [[ $XLA_TARGET == rocm ]]; then
       echo "BUILDING..."
       ./builds/build.sh rocm
-      ls "$(pwd)/builds/output/rocm/build/0.8.1/cache/build/"
-      ls "$(pwd)/builds/output/rocm/build/*/cache/build/xla_extension-x86_64-linux-gnu-rocm.tar.gz"
-      cp -r "$(pwd)/builds/output/rocm/build/*/cache/build/" "$build_archive_dir/$archive_filename"
+      find "$(pwd)/builds/output/$XLA_TARGET" -type f -name "$archive_filename" -exec cp {} "$build_archive_dir/$archive_filename" \;
       echo "BUILD COMPLETE"
     else
       XLA_BUILD=true mix compile
