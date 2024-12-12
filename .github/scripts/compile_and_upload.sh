@@ -20,6 +20,7 @@ if gh release list | grep $tag; then
     if [[ $XLA_TARGET == rocm ]]; then
       echo "BUILDING..."
       ./builds/build.sh rocm
+      mkdir -p "$build_archive_dir"
       find "$(pwd)/builds/output/$XLA_TARGET" -type f -name "$archive_filename" -exec cp {} "$build_archive_dir/$archive_filename" \;
       echo "BUILD COMPLETE"
     else
