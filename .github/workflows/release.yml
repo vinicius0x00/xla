@@ -21,85 +21,29 @@ jobs:
           fi
 
   linux:
-    name: "x86_64-linux-gnu-{cpu,tpu}"
+    name: "x86_64-linux-gnu-{cpu,tpu,rocm}"
     needs: [create_draft_release]
     # We intentionally build on ubuntu 20 to compile against
     # an older version of glibc
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "24"
           elixir-version: "1.15.8"
-      # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
+      # Get more space for rocm compilation
+      - uses: jlumbroso/free-disk-space@v1.3.1
         with:
-          version: "6.5.0"
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-      - run: python -m pip install --upgrade pip numpy
-      # Build and upload the archives
-      - run: mix deps.get
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
       - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: cpu
-          CC: gcc-9
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: tpu
-          CC: gcc-9
-
-  macos:
-    name: "x86_64-darwin-cpu"
-    needs: [create_draft_release]
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
-      - run: brew install elixir
-      - run: mix local.hex --force
-      # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "6.5.0"
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-      - run: python -m pip install --upgrade pip numpy
-      # Build and upload the archive
-      - run: mix deps.get
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: cpu
-          CC: gcc-9
-
-  macos_arm:
-    name: "aarch64-darwin-cpu (cross-compiled)"
-    needs: [create_draft_release]
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
-      - run: brew install elixir
-      - run: mix local.hex --force
-      # Setup the compilation environment
-      - uses: abhinavsingh/setup-bazel@v3
-        with:
-          version: "6.5.0"
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-      - run: python -m pip install --upgrade pip numpy
-      # Build and upload the archive
-      - run: mix deps.get
-      - run: .github/scripts/compile_and_upload.sh ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          XLA_TARGET: cpu
-          XLA_TARGET_PLATFORM: "aarch64-darwin"
-          # Explicitly cross-compile for arm64
-          BUILD_FLAGS: "--config=macos_arm64"
-          CC: gcc-9
+          XLA_TARGET: rocm

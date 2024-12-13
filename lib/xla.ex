@@ -12,7 +12,7 @@ defmodule XLA do
 
   @version Mix.Project.config()[:version]
 
-  @base_url "https://github.com/elixir-nx/xla/releases/download/v#{@version}"
+  @base_url "https://github.com/vinicius0x00/xla/releases/download/v#{@version}"
 
   @precompiled_targets [
     "x86_64-darwin-cpu",

@@ -82,5 +82,6 @@ RUN mix deps.get
 COPY lib lib
 COPY Makefile ./
 COPY extension extension
+COPY README.md README.md
 
 CMD [ "mix", "compile" ]
