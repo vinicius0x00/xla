@@ -7,6 +7,7 @@ cd "$(dirname "$0")/../.."
 tag=$1
 
 # Ensure tasks are compiled
+mix deps.get
 mix compile
 
 if gh release list | grep $tag; then
@@ -16,7 +17,13 @@ if gh release list | grep $tag; then
   if gh release view $tag | grep $archive_filename; then
     echo "Found $archive_filename in $tag release artifacts, skipping compilation"
   else
-    XLA_BUILD=true mix compile
+    if [[ $XLA_TARGET == rocm ]]; then
+      ./builds/build.sh rocm
+      mkdir -p "$build_archive_dir"
+      cp "$(pwd)/builds/output/$XLA_TARGET/build/"*"/build/$archive_filename" "$build_archive_dir/$archive_filename"
+    else
+      XLA_BUILD=true mix compile
+    fi
 
     # Uploading is the final action after several hour long build,
     # so in case of any temporary network failures we want to retry
