@@ -21,7 +21,7 @@ if gh release list | grep $tag; then
       echo "BUILDING..."
       ./builds/build.sh rocm
       mkdir -p "$build_archive_dir"
-      find "$(pwd)/builds/output/$XLA_TARGET" -type f -name "$archive_filename" -exec cp {} "$build_archive_dir/$archive_filename" \;
+      find "$(pwd)/builds/output/$XLA_TARGET" ! -readable -prune -o -type f -name "$archive_filename" -exec cp {} "$build_archive_dir/$archive_filename" \;
       echo "BUILD COMPLETE"
     else
       XLA_BUILD=true mix compile
