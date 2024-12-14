@@ -21,7 +21,8 @@ defmodule XLA do
     "aarch64-linux-gnu-cpu",
     "x86_64-linux-gnu-cuda12",
     "aarch64-linux-gnu-cuda12",
-    "x86_64-linux-gnu-tpu"
+    "x86_64-linux-gnu-tpu",
+    "x86_64-linux-gnu-rocm"
   ]
 
   @supported_xla_targets ["cpu", "cuda", "rocm", "tpu", "cuda12"]
